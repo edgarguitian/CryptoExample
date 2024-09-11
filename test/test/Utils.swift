@@ -7,6 +7,7 @@
 
 import Foundation
 import CommonCrypto
+import UIKit
 
 
 // Guardar en la cartera de certificados (Keychain)
@@ -123,3 +124,43 @@ func aes256_cbc(data: Data, key: String, /* Vector de inicialización */ inicial
 
 */
 
+// Excluir fichero del backup
+func ficheroNoCopia() {
+    let docDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    var fileURL1 = docDirectory.appendingPathComponent("ficheroPrueba1.txt")
+    var fileURL2 = docDirectory.appendingPathComponent("ficheroPrueba2.txt")
+    
+    let testString = "ejemplo"
+    
+    try! testString.write(to: fileURL1, atomically: true, encoding: .utf8)
+    try! testString.write(to: fileURL2, atomically: true, encoding: .utf8)
+    
+    var config = URLResourceValues()
+
+    config.isExcludedFromBackup = true
+    do {
+        try fileURL1.setResourceValues(config)
+    } catch {
+        print(error)
+    }
+}
+
+// Copiado a portapapeles temporal de 20 segundos
+func copySecure(text: String) {
+    let labelProvider = text as NSItemProviderWriting
+    UIPasteboard.general.setObjects([labelProvider], localOnly: true, expirationDate: Date().addingTimeInterval(20))
+}
+
+// Detectar cambios en portapapeles
+/*
+ NotificationCenter.default.addObserver(self, selector: #selector(clipboard(sender:)), name: NSNotification.Name.UIPasteboardChanged, object: nil)
+ 
+ @objc func clipboard(sender: NSNotification) {
+ if UIPasteboard.genera.hasStrings {
+     NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIPasteboardChanged, object: nil)
+     UIPasteboard.general.string = ""
+     NotificationCenter.default.addObserver(self, selector: #selector(clipboard(sender:)), name: NSNotification.Name.UIPasteboardChanged, object: nil)
+ }
+ }
+*/
+ 
